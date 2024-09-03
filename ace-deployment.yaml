@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: <namespace>
+  name: ace
+  annotations: {}
+  labels:
+     app: ace
+spec:
+  selector:
+    matchLabels:
+      app: ace
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ace
+    spec:
+      containers:
+        - name: container
+          image: >-
+            cp.icr.io/cp/appc/ace:12.0.12.5-r1@sha256:042857bb792a2b5101f1819dafb0fa178632e69a59856a14f76b05e85ae41646
+          ports:
+            - containerPort: 7600
+              protocol: TCP
+          env:
+            - name: LICENSE
+              value: accept
+          volumeMounts:
+            - mountPath: /home/aceuser/initial-config/bar/
+              name: variables
+              readOnly: true
+          command:
+            - bash
+            - '-c'
+            - >-
+              . /opt/ibm/ace-12/server/bin/mqsiprofile;
+              /opt/ibm/ace-12/server/bin/ibmint deploy --input-bar-file
+              /home/aceuser/initial-config/bar/<name>.bar
+              --output-work-directory /home/aceuser/ace-server/; 
+              IntegrationServer --name ace-server  -w /home/aceuser/ace-server
+      volumes:
+        - name: variables
+          configMap:
+           name: ace-bar
+      imagePullSecrets:
+        - name: ibm-entitlement-key
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  paused: false
