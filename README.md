@@ -18,7 +18,7 @@ kubectl create secret docker-registry ibm-entitlement-key --docker-server=cp.icr
 ```
 kubectl create configmap ace-bar --from-file=<name>.bar
 ```
-7. Update the `ace-deployment.yaml` with the proper namespace, image version, and bar file name
+7. Update the `ace-deployment.yaml` with the proper namespace, [image](https://www.ibm.com/docs/en/app-connect/12.0?topic=cacerid-building-sample-supported-app-connect-enterprise-image-using-docker) version, and bar file name
 8. Deploy the deployment
 ```
 kubectl apply -f ace-deployment.yaml
